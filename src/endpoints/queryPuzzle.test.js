@@ -3,11 +3,13 @@ import setupServer from "../serverSetup";
 import fakeAuth from "../../test/fakeAuth";
 import request from "supertest";
 import {testingStart} from 'puzzle-host-data-layer';
+import {EventEmitter} from "node:events";
+import {PUZZLE_QUERIED_EVENT} from "./puzzleListener";
 
 describe('querying a puzzle', () => {
   jest.setTimeout(60000);
 
-  let dataAccess, teardown, expressApp;
+  let dataAccess, teardown, expressApp, eventEmitter;
   let originalUser = "123344567";
   const userHelper = {id: originalUser};
 
@@ -17,7 +19,8 @@ describe('querying a puzzle', () => {
     expressApp = express();
 
     ({dataAccess, teardown} = await testingStart());
-    setupServer(expressApp, fakeAuth(userHelper), dataAccess);
+    eventEmitter = new EventEmitter();
+    setupServer(expressApp, fakeAuth(userHelper), dataAccess, eventEmitter);
   });
 
   afterEach(async () => {
@@ -141,6 +144,72 @@ describe('querying a puzzle', () => {
         .get(`/api/queryPuzzle/${puzzleId}/4654`);
 
       expect(response.status).toBe(404);
+    });
+
+    test('event is emitted when there is a correct query', async () => {
+      const puzzleId = (await request(expressApp)
+        .post("/api/puzzle")
+        .set("Content-Type", "application/json")
+        .send(JSON.stringify({name: "my first puzzle" }))).text;
+
+      const value1 = "5", value2 = "8", value3 = "10";
+      await createAnswers(puzzleId, value1, value2, value3);
+
+      let eventEmitted = false;
+      eventEmitter.on(PUZZLE_QUERIED_EVENT, (puzzle, success) => {
+        expect(puzzle).toEqual(+puzzleId);
+        expect(success).toBe(true);
+        eventEmitted = true;
+      });
+
+      await request(expressApp)
+        .get(`/api/queryPuzzle/${puzzleId}/${value1}/${value2}/${value3}`)
+
+      expect(eventEmitted).toBe(true);
+    });
+
+    test('event is emitted when there is an incorrect query', async () => {
+      const puzzleId = (await request(expressApp)
+        .post("/api/puzzle")
+        .set("Content-Type", "application/json")
+        .send(JSON.stringify({name: "my first puzzle" }))).text;
+
+      const value1 = "5", value2 = "8", value3 = "10";
+      await createAnswers(puzzleId, value1, value2, value3);
+
+      let eventEmitted = false;
+      eventEmitter.on(PUZZLE_QUERIED_EVENT, (puzzle, success) => {
+        expect(puzzle).toEqual(+puzzleId);
+        expect(success).toBe(false);
+        eventEmitted = true;
+      });
+
+      await request(expressApp)
+        .get(`/api/queryPuzzle/${puzzleId}/${value1}/${value3}/${value3}`)
+
+      expect(eventEmitted).toBe(true);
+    });
+
+    test('event is emitted when too many answers are provided', async () => {
+      const puzzleId = (await request(expressApp)
+        .post("/api/puzzle")
+        .set("Content-Type", "application/json")
+        .send(JSON.stringify({name: "my first puzzle" }))).text;
+
+      const value1 = "5", value2 = "8", value3 = "10";
+      await createAnswers(puzzleId, value1, value2, value3);
+
+      let eventEmitted = false;
+      eventEmitter.on(PUZZLE_QUERIED_EVENT, (puzzle, success) => {
+        expect(puzzle).toEqual(+puzzleId);
+        expect(success).toBe(false);
+        eventEmitted = true;
+      });
+
+      await request(expressApp)
+        .get(`/api/queryPuzzle/${puzzleId}/${value1}/${value3}/${value3}/${value2}`)
+
+      expect(eventEmitted).toBe(true);
     });
   });
 });

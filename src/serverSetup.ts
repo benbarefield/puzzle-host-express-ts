@@ -3,11 +3,14 @@ import puzzle from "./endpoints/puzzle";
 import userPuzzles from "./endpoints/userPuzzles";
 import puzzleAnswer from "./endpoints/puzzleAnswer";
 import queryPuzzle from "./endpoints/queryPuzzle";
+import EventEmitter from "node:events";
 
 export const DB_CLIENT = "dbClient";
+export const EVENT_EMITTER = "eventEmitter";
 
-export default function setupServer(app : Application, authMiddleware: RequestHandler, dataAccess: any) {
+export default function setupServer(app : Application, authMiddleware: RequestHandler, dataAccess: any, eventEmitter: EventEmitter = null) {
   app.set(DB_CLIENT, dataAccess);
+  app.set(EVENT_EMITTER, eventEmitter);
   app.use(authMiddleware);
   app.use(json());
   app.use(urlencoded({extended: false}));

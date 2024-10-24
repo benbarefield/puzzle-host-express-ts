@@ -1,6 +1,7 @@
 import {Request, Response} from "express";
 import {getAnswersForPuzzle} from "puzzle-host-data-layer";
-import {DB_CLIENT} from "../serverSetup";
+import {DB_CLIENT, EVENT_EMITTER} from "../serverSetup";
+import {PUZZLE_QUERIED_EVENT} from "./puzzleListener";
 
 export default async function(req: Request, res: Response): Promise<void> {
   if(req.method !== "GET") {
@@ -26,16 +27,22 @@ export default async function(req: Request, res: Response): Promise<void> {
   const providedAnswers = req.params[0].split('/');
 
   if(providedAnswers.length > answers.length) {
+    req.app.get(EVENT_EMITTER)?.emit(PUZZLE_QUERIED_EVENT, puzzleId, false);
     res.status(414).send("Incorrect");
     return;
   }
 
+  let correct = true;
   for(let i = 0; i < answers.length; i++) {
     if(answers[i].value != providedAnswers[i]) {
-      res.status(422).send("Incorrect");
-      return;
+      correct = false;
     }
   }
 
-  res.status(200).send("Correct");
+  req.app.get(EVENT_EMITTER)?.emit(PUZZLE_QUERIED_EVENT, puzzleId, correct);
+  if(correct) {
+    res.status(200).send("Correct");
+  } else {
+    res.status(422).send("Incorrect");
+  }
 }

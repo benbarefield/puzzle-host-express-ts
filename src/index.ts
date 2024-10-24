@@ -1,11 +1,14 @@
 import 'dotenv/config';
 import express from "express";
+import websocketExpress from 'express-ws';
 import {sessionStarter} from "puzzle-host-data-layer";
-import setupServer from "./serverSetup";
+import setupServer, {EVENT_EMITTER} from "./serverSetup";
 import authorization from "./authorization";
+import puzzleListener from "./endpoints/puzzleListener";
+import EventEmitter from "node:events";
 
 const port = 8888;
-const app = express();
+const app = websocketExpress(express()).app;
 
 (async function() {
   // todo: fix up cors.
@@ -24,7 +27,11 @@ const app = express();
     console.log("error connecting to database:", e);
     return;
   }
-  setupServer(app, authorization, dbClient);
+  const eventing = new EventEmitter();
+
+  setupServer(app, authorization, dbClient, eventing);
+
+  app.ws("/puzzle/:id", puzzleListener(eventing));
 
   app.listen(port, () => {
     console.log(`Server started on port: ${port}
