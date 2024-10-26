@@ -34,10 +34,10 @@ describe('querying a puzzle', () => {
         .expect(501, done);
     });
 
-    test('responds with 400 for a bad puzzle id', done => {
+    test('responds with 404 for a potentially invalid id', done => {
       request(expressApp)
         .get('/api/queryPuzzle/asdf/123123')
-        .expect(400, done);
+        .expect(404, done);
     });
   });
 
@@ -157,7 +157,7 @@ describe('querying a puzzle', () => {
 
       let eventEmitted = false;
       eventEmitter.on(PUZZLE_QUERIED_EVENT, (puzzle, success) => {
-        expect(puzzle).toEqual(+puzzleId);
+        expect(puzzle).toEqual(puzzleId);
         expect(success).toBe(true);
         eventEmitted = true;
       });
@@ -179,7 +179,7 @@ describe('querying a puzzle', () => {
 
       let eventEmitted = false;
       eventEmitter.on(PUZZLE_QUERIED_EVENT, (puzzle, success) => {
-        expect(puzzle).toEqual(+puzzleId);
+        expect(puzzle).toEqual(puzzleId);
         expect(success).toBe(false);
         eventEmitted = true;
       });
@@ -201,7 +201,7 @@ describe('querying a puzzle', () => {
 
       let eventEmitted = false;
       eventEmitter.on(PUZZLE_QUERIED_EVENT, (puzzle, success) => {
-        expect(puzzle).toEqual(+puzzleId);
+        expect(puzzle).toEqual(puzzleId);
         expect(success).toBe(false);
         eventEmitted = true;
       });

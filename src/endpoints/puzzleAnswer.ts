@@ -18,21 +18,14 @@ async function postPuzzleAnswer(req: Request, res: Response) : Promise<void> {
   }
 
   const dataAccess = req.app.get(DB_CLIENT);
-  const {puzzle, value, answerIndex}: {puzzle: number, value: string, answerIndex: number} = req.body;
+  const {puzzle, value, answerIndex}: {puzzle: string, value: string, answerIndex: number} = req.body;
 
-  if(isNaN(puzzle)) {
-    res.status(400).send("Invalid puzzle id");
-    return;
-  }
-
-  const puzzleData = await getPuzzleById(dataAccess, puzzle);
-
-  if(!puzzleData) {
+  const allowed = await verifyPuzzleOwnership(dataAccess, puzzle, currentUser);
+  if(allowed === null) {
     res.status(404).send();
     return;
   }
-
-  if(puzzleData.owner !== currentUser) {
+  if(!allowed) {
     res.status(401).send();
     return;
   }
@@ -49,20 +42,15 @@ async function getPuzzleAnswer(req: Request, res: Response) : Promise<void> {
     return;
   }
   const dataAccess = req.app.get(DB_CLIENT);
-  let puzzleId = +req.query.puzzle;
-  const answerId = +req.params.id;
-  if((puzzleId || puzzleId === 0) && answerId) {
+  let puzzleId = req.query.puzzle?.toString() || "";
+  const answerId = req.params.id;
+  if(puzzleId !== "" && answerId !== undefined) {
     res.status(414).send("Unsupported to get a puzzle answer by puzzle id and answer id");
     return;
   }
 
-  if(isNaN(puzzleId) && isNaN(answerId)) {
-    res.status(400).send("Invalid puzzle Id or answer Id");
-    return;
-  }
-
   let dataToSend: string;
-  if(!puzzleId && puzzleId !== 0) { // support for id = 0?
+  if(puzzleId === "") {
     const answer = await getPuzzleAnswerById(dataAccess, answerId);
     if(!answer) {
       res.status(404).send();
@@ -79,6 +67,10 @@ async function getPuzzleAnswer(req: Request, res: Response) : Promise<void> {
   }
 
   const ownershipVerified = await verifyPuzzleOwnership(dataAccess, puzzleId, currentUser);
+  if(ownershipVerified === null) {
+    res.status(404).send();
+    return;
+  }
   if(!ownershipVerified) {
     res.status(401).send();
     return;
@@ -102,15 +94,10 @@ async function getPuzzleAnswer(req: Request, res: Response) : Promise<void> {
 async function deletePuzzleAnswer(req: Request, res: Response) : Promise<void> {
   const dataAccess = req.app.get(DB_CLIENT);
   const currentUser = req.authenticatedUser;
-  const answerId = +req.params.id;
+  const answerId = req.params.id;
 
   if(!currentUser) {
     res.status(403).send();
-    return;
-  }
-
-  if(isNaN(answerId)) {
-    res.status(400).send();
     return;
   }
 
@@ -119,8 +106,8 @@ async function deletePuzzleAnswer(req: Request, res: Response) : Promise<void> {
     res.status(404).send();
     return;
   }
-  const allowed = await verifyPuzzleOwnership(dataAccess, answer.puzzle, currentUser);
 
+  const allowed = await verifyPuzzleOwnership(dataAccess, answer.puzzle, currentUser);
   if(!allowed) {
     res.status(401).send();
     return;
@@ -135,7 +122,7 @@ async function deletePuzzleAnswer(req: Request, res: Response) : Promise<void> {
 async function putPuzzleAnswer(req: Request, res: Response) : Promise<void> {
   const dataAccess = req.app.get(DB_CLIENT);
   const currentUser = req.authenticatedUser;
-  const answerId = +req.params.id;
+  const answerId = req.params.id;
   const {value, answerIndex}: {value: string | undefined, answerIndex: number | undefined} = req.body;
 
   if(!currentUser) {
@@ -143,14 +130,13 @@ async function putPuzzleAnswer(req: Request, res: Response) : Promise<void> {
     return;
   }
 
-  if(isNaN(answerId)) {
-    res.status(400).send();
-    return;
-  }
-
   let success = false;
   try {
     const answer = await getPuzzleAnswerById(dataAccess, answerId);
+    if(answer === null) {
+      res.status(404).send();
+      return;
+    }
     const allowed = await verifyPuzzleOwnership(dataAccess, answer.puzzle, currentUser);
     if(!allowed) {
       res.status(401).send();

@@ -19,16 +19,11 @@ async function postPuzzle(req: Request, res: Response): Promise<void> {
 
 async function getPuzzle(req: Request, res: Response): Promise<void> {
   const dataAccess = req.app.get(DB_CLIENT);
-  const puzzleId = Number(req.params.id);
+  const puzzleId = req.params.id;
   const currentUser = req.authenticatedUser;
 
   if(!currentUser) {
     res.status(401).send();
-    return;
-  }
-
-  if(isNaN(puzzleId)) {
-    res.status(400).send("Invalid puzzle id");
     return;
   }
 
@@ -48,7 +43,7 @@ async function getPuzzle(req: Request, res: Response): Promise<void> {
 
 async function deletePuzzle(req: Request, res: Response): Promise<void> {
   const dataAccess = req.app.get(DB_CLIENT);
-  const puzzleId = Number(req.params.id);
+  const puzzleId = req.params.id;
   const currentUser = req.authenticatedUser;
 
   if(!currentUser) {
@@ -56,25 +51,28 @@ async function deletePuzzle(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  if(isNaN(puzzleId)) {
-    res.status(400).send("Invalid puzzle id");
+  const allowed = await verifyPuzzleOwnership(dataAccess, puzzleId, currentUser);
+  if(allowed === null) {
+    res.status(404).send();
     return;
   }
-
-  const allowed = await verifyPuzzleOwnership(dataAccess, puzzleId, currentUser);
   if(!allowed) {
     res.status(403).send();
     return;
   }
 
-  await markPuzzleAsDeleted(dataAccess, puzzleId);
+  const success = await markPuzzleAsDeleted(dataAccess, puzzleId);
+  if(!success) {
+    res.status(404).send();
+    return;
+  }
 
   res.status(204).send();
 }
 
 async function putPuzzle(req: Request, res: Response): Promise<void> {
   const dataAccess = req.app.get(DB_CLIENT);
-  const puzzleId = +req.params.id;
+  const puzzleId = req.params.id;
   const currentUser = req.authenticatedUser;
   const {name}: {name: string} = req.body;
 
@@ -83,12 +81,11 @@ async function putPuzzle(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  if(isNaN(puzzleId)) {
-    res.status(400).send('Invalid puzzle id');
+  const allowed = await verifyPuzzleOwnership(dataAccess, puzzleId, currentUser);
+  if(allowed === null) {
+    res.status(404).send();
     return;
   }
-
-  const allowed = await verifyPuzzleOwnership(dataAccess, puzzleId, currentUser);
   if(!allowed) {
     res.status(401).send();
     return;
@@ -101,6 +98,10 @@ async function putPuzzle(req: Request, res: Response): Promise<void> {
   catch(e) {
 
   }
+  // if(!success) {
+  //   res.status(404).send();
+  //   return;
+  // }
 
   res.status(204).send();
 }

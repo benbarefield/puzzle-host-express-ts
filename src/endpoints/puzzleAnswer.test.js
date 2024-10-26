@@ -31,16 +31,16 @@ describe('puzzle answer endpoint', () => {
         .expect(501, done);
     });
 
-    test('getting a answer with a bad id is not responds with a 400', (done) => {
+    test('getting a answer with a potentially bad id is not responds with a 404', (done) => {
       request(expressApp)
         .get('/api/puzzleAnswer/asdf')
-        .expect(400, done);
+        .expect(404, done);
     });
 
-    test('getting a answer with a bad puzzle id is not responds with a 400', (done) => {
+    test('getting a answer with a potentially bad puzzle id is not responds with a 404', (done) => {
       request(expressApp)
         .get('/api/puzzleAnswer/?puzzle=asdf')
-        .expect(400, done);
+        .expect(404, done);
     });
   });
 
@@ -108,7 +108,7 @@ describe('puzzle answer endpoint', () => {
         .expect(403, done);
     });
 
-    test('responds with 400 for a bad puzzle id', done => {
+    test('responds with 404 for a potentially bad puzzle id', done => {
       request(expressApp)
         .post('/api/puzzleAnswer')
         .set("Content-Type", "application/json")
@@ -117,7 +117,7 @@ describe('puzzle answer endpoint', () => {
           value: "5",
           answerIndex: 0,
         }))
-        .expect(400, done);
+        .expect(404, done);
     });
   });
 
@@ -129,7 +129,7 @@ describe('puzzle answer endpoint', () => {
         .send(JSON.stringify({name: "my first puzzle" }))).text;
 
       const value = "5";
-      const answerIndex = 3;
+      const answerIndex = 0;
       const answerId = (await request(expressApp)
         .post('/api/puzzleAnswer')
         .set("Content-Type", "application/json")
@@ -149,7 +149,7 @@ describe('puzzle answer endpoint', () => {
         value,
         answerIndex,
         puzzle: puzzleId,
-        id: +answerId,
+        id: answerId,
       });
     });
 
@@ -333,7 +333,7 @@ describe('puzzle answer endpoint', () => {
         .set("Content-Type", "application/json")
         .send(JSON.stringify({
           puzzle: puzzleId,
-          value: 10,
+          value: "10",
           answerIndex: 0,
         }))).text;
     });
@@ -383,10 +383,10 @@ describe('puzzle answer endpoint', () => {
       expect(response.status).toEqual(200);
     });
 
-    test('responds with a 400 when the answer id is not valid', (done) => {
+    test('responds with a 404 when the answer id is potentially not valid', (done) => {
       request(expressApp)
         .delete(`/api/puzzleAnswer/abcd`)
-        .expect(400, done);
+        .expect(404, done);
     });
 
     test('it should update the answer indexes', async () => {
@@ -395,7 +395,7 @@ describe('puzzle answer endpoint', () => {
         .set("Content-Type", "application/json")
         .send(JSON.stringify({
           puzzle: puzzleId,
-          value: 11,
+          value: "11",
           answerIndex: 1,
         }))).text;
 
@@ -404,7 +404,7 @@ describe('puzzle answer endpoint', () => {
         .set("Content-Type", "application/json")
         .send(JSON.stringify({
           puzzle: puzzleId,
-          value: 12,
+          value: "12",
           answerIndex: 2,
         }))).text;
 
@@ -434,7 +434,7 @@ describe('puzzle answer endpoint', () => {
         .set("Content-Type", "application/json")
         .send(JSON.stringify({
           puzzle: puzzleId,
-          value: 0,
+          value: "0",
           answerIndex: 0,
         }));
 
@@ -443,7 +443,7 @@ describe('puzzle answer endpoint', () => {
         .set("Content-Type", "application/json")
         .send(JSON.stringify({
           puzzle: puzzleId,
-          value: 10,
+          value: "10",
           answerIndex: 1,
         }))).text;
 
@@ -452,7 +452,7 @@ describe('puzzle answer endpoint', () => {
         .set("Content-Type", "application/json")
         .send(JSON.stringify({
           puzzle: puzzleId,
-          value: 100,
+          value: "100",
           answerIndex: 2,
         }));
     });
@@ -508,12 +508,12 @@ describe('puzzle answer endpoint', () => {
       expect(data.value).toBe("10");
     });
 
-    test('invalid answer id responds with a 400', done => {
+    test('potentially invalid answer id responds with a 404', done => {
       request(expressApp)
         .put(`/api/puzzleAnswer/abcdedf`)
         .set("Content-Type", "application/json")
         .send(JSON.stringify({value: "a different value"}))
-        .expect(400, done);
+        .expect(404, done);
     });
 
     test("updating the answer index to be bigger results in reducing later answer indexes", async () => {

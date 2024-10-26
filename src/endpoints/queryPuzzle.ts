@@ -10,12 +10,7 @@ export default async function(req: Request, res: Response): Promise<void> {
   }
 
   const dataAccess = req.app.get(DB_CLIENT);
-  const puzzleId = +req.params.id;
-
-  if(isNaN(puzzleId)) {
-    res.status(400).send("Invalid puzzle id");
-    return;
-  }
+  const puzzleId = req.params.id;
 
   const answers = await getAnswersForPuzzle(dataAccess, puzzleId);
   if(answers.length === 0) {

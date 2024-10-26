@@ -33,10 +33,10 @@ describe("puzzle endpoint", () => {
   });
 
   describe("bad inputs", () => {
-    test('should respond with 400 when the puzzle id is invalid', (done) => {
+    test('should respond with 404 when the puzzle id might be invalid', (done) => {
       request(expressApp)
         .get("/api/puzzle/abcd")
-        .expect(400, done);
+        .expect(404, done);
     });
   });
 
@@ -143,10 +143,10 @@ describe("puzzle endpoint", () => {
         .expect(401, done);
     });
 
-    test('it responds with a 400 when the puzzle id is invalid', done => {
+    test('it responds with a 404 when the puzzle id may be invalid', done => {
       request(expressApp)
         .delete('/api/puzzle/abcd')
-        .expect(400, done);
+        .expect(404, done);
     });
 
     test('it responds with a 403 when the authenticated user does not own the puzzle', async () => {
@@ -162,12 +162,10 @@ describe("puzzle endpoint", () => {
       const data = JSON.parse(puzzleResponse.text);
 
       expect(data).toEqual({
-        id: +puzzleId,
+        id: puzzleId,
         name: puzzleName
       });
     });
-
-    // 404?
   });
 
   describe('updating a puzzle', () => {
@@ -231,12 +229,12 @@ describe("puzzle endpoint", () => {
       expect(data.name).toBe(puzzleName);
     });
 
-    test('response with a 400 when the puzzle id is not valid', done => {
+    test('response with a 404 when the puzzle id may not be valid', done => {
       request(expressApp)
         .put(`/api/puzzle/asdfasdf`)
         .set("Content-Type", "application/json")
         .send(JSON.stringify({name: "newName"}))
-        .expect(400, done);
+        .expect(404, done);
     });
   });
 });

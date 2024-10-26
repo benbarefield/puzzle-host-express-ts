@@ -33,21 +33,20 @@
         ]
     },
     "dependencies": {
-        "@types/express": "^5.0.0",
-        "@types/node": "^20.14.2",
-        "@types/pg": "^8.11.10",
-        "dotenv": "^16.4.5",
         "express": "^4.19.2",
         "express-ws": "^5.0.2",
         "pg": "^8.13.0",
-        "puzzle-host-data-layer": "https://github.com/benbarefield/puzzle-host-postgres-js.git",
-        "typescript": "^5.4.5"
+        "puzzle-host-data-layer": "github:benbarefield/puzzle-host-postgres-js"
     },
     "devDependencies": {
+        "@types/express": "^5.0.0",
+        "@types/node": "^20.14.2",
+        "@types/pg": "^8.11.10",
+        "typescript": "^5.4.5",
+        "dotenv": "^16.4.5",
         "@babel/core": "^7.25.2",
         "@babel/preset-env": "^7.25.4",
         "@babel/preset-typescript": "^7.24.7",
-        "@testcontainers/postgresql": "^10.13.1",
         "@types/express-ws": "^3.0.5",
         "babel-jest": "^29.7.0",
         "concurrently": "^9.0.1",
