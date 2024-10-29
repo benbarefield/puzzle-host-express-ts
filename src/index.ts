@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from "express";
 import websocketExpress from 'express-ws';
 import {sessionStarter} from "puzzle-host-data-layer";
-import setupServer, {EVENT_EMITTER} from "./serverSetup";
+import setupServer from "./serverSetup";
 import authorization from "./authorization";
 import puzzleListener from "./endpoints/puzzleListener";
 import EventEmitter from "node:events";

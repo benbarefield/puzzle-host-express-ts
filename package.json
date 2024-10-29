@@ -15,7 +15,8 @@
         "watch": "npm-watch",
         "serve": "nodemon ./dist/index.js",
         "test": "jest --watch",
-        "child-start": "npm run build && npm run serve"
+        "package": "rollup --config rollup.config.js --configPlugin typescript",
+        "child-start": "npm run package && node ./dist/index.js"
     },
     "jest": {
         "testPathIgnorePatterns": [
@@ -34,15 +35,18 @@
         ]
     },
     "dependencies": {
-        "express": "^4.19.2",
-        "express-ws": "^5.0.2",
-        "pg": "^8.13.0",
+        "@rollup/plugin-typescript": "^12.1.1",
         "@types/express": "^5.0.0",
         "@types/express-ws": "^3.0.5",
         "@types/node": "^20.14.2",
         "@types/pg": "^8.11.10",
-        "typescript": "^5.4.5",
-        "dotenv": "^16.4.5"
+        "dotenv": "^16.4.5",
+        "express": "^4.19.2",
+        "express-ws": "^5.0.2",
+        "pg": "^8.13.0",
+        "puzzle-host-data-layer": "github:benbarefield/puzzle-host-postgres-js",
+        "rollup": "^4.24.3",
+        "typescript": "^5.4.5"
     },
     "devDependencies": {
         "@babel/core": "^7.25.2",
