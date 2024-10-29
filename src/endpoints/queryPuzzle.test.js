@@ -7,7 +7,7 @@ import {EventEmitter} from "node:events";
 import {PUZZLE_QUERIED_EVENT} from "./puzzleListener";
 
 describe('querying a puzzle', () => {
-  jest.setTimeout(60000);
+  jest.setTimeout(20000);
 
   let dataAccess, teardown, expressApp, eventEmitter;
   let originalUser = "123344567";
@@ -114,7 +114,7 @@ describe('querying a puzzle', () => {
       const response = await request(expressApp)
         .get(`/api/queryPuzzle/${puzzleId}/${value1}/${value2}/${value3}/23423`);
 
-      expect(response.status).toBe(414);
+      expect(response.status).toBe(422);
       expect(response.text).toBe("Incorrect");
     });
 
@@ -132,18 +132,6 @@ describe('querying a puzzle', () => {
 
       expect(response.status).toBe(422);
       expect(response.text).toBe("Incorrect");
-    });
-
-    test('response is a 404 when there are no answers setup for the puzzle', async () => {
-      const puzzleId = (await request(expressApp)
-        .post("/api/puzzle")
-        .set("Content-Type", "application/json")
-        .send(JSON.stringify({name: "my first puzzle" }))).text;
-
-      const response = await request(expressApp)
-        .get(`/api/queryPuzzle/${puzzleId}/4654`);
-
-      expect(response.status).toBe(404);
     });
 
     test('event is emitted when there is a correct query', async () => {

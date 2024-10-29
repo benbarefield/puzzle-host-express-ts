@@ -5,7 +5,7 @@ import request from "supertest";
 import {testingStart} from 'puzzle-host-data-layer';
 
 describe('puzzle answer endpoint', () => {
-  jest.setTimeout(60000);
+  jest.setTimeout(20000);
 
   let dataAccess, teardown, expressApp;
   let originalUser = "123344567";

@@ -5,7 +5,7 @@ import fakeAuth from "../../test/fakeAuth";
 import {testingStart} from 'puzzle-host-data-layer';
 
 describe("puzzle endpoint", () => {
-  jest.setTimeout(60000);
+  jest.setTimeout(20000);
 
   let dataAccess, teardown, expressApp;
   const originalUser = "123344567";
