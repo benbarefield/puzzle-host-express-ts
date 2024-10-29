@@ -1,5 +1,6 @@
 {
     "name": "puzzle-host-server",
+    "type": "module",
     "watch": {
         "build": {
             "patterns": [
@@ -35,6 +36,7 @@
         ]
     },
     "dependencies": {
+        "@rollup/plugin-node-resolve": "^15.3.0",
         "@rollup/plugin-typescript": "^12.1.1",
         "@types/express": "^5.0.0",
         "@types/express-ws": "^3.0.5",
@@ -45,6 +47,7 @@
         "express-ws": "^5.0.2",
         "pg": "^8.13.0",
         "rollup": "^4.24.3",
+        "tslib": "^2.8.0",
         "typescript": "^5.4.5"
     },
     "devDependencies": {
