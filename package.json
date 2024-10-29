@@ -44,7 +44,6 @@
         "express": "^4.19.2",
         "express-ws": "^5.0.2",
         "pg": "^8.13.0",
-        "puzzle-host-data-layer": "github:benbarefield/puzzle-host-postgres-js",
         "rollup": "^4.24.3",
         "typescript": "^5.4.5"
     },
