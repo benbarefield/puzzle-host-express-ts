@@ -19,8 +19,5 @@ export default async function(req: Request, res: Response) : Promise<void> {
   const puzzles = await getPuzzlesForUser(dataAccess, userId);
 
   res.set('Content-Type', 'application/json');
-  res.send(JSON.stringify(puzzles.map(p => ({
-    id: p.id,
-    name: p.name,
-  }))));
+  res.send(JSON.stringify(puzzles));
 }

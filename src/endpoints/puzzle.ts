@@ -38,7 +38,7 @@ async function getPuzzle(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  res.send(JSON.stringify({name : puzzleData.name, id: puzzleId}));
+  res.send(JSON.stringify(puzzleData));
 }
 
 async function deletePuzzle(req: Request, res: Response): Promise<void> {

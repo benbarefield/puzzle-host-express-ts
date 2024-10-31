@@ -79,12 +79,7 @@ async function getPuzzleAnswer(req: Request, res: Response) : Promise<void> {
   if(!dataToSend) {
     const answers = await getAnswersForPuzzle(dataAccess, puzzleId);
 
-    dataToSend = JSON.stringify(answers.map(p => ({
-      id: p.id,
-      value: p.value,
-      puzzle: p.puzzle,
-      answerIndex: p.answerIndex,
-    })));
+    dataToSend = JSON.stringify(answers);
   }
 
   res.set('Content-Type', 'application/json');
