@@ -1,6 +1,5 @@
 {
     "name": "puzzle-host-server",
-    "type": "module",
     "watch": {
         "build": {
             "patterns": [
@@ -12,12 +11,11 @@
     "scripts": {
         "prestart": "npm run build",
         "start": "concurrently --killOthers \"npm run watch\" \"npm run serve\"",
-        "build": "npx tsc",
+        "build": "rimraf ./dist && npx tsc",
         "watch": "npm-watch",
         "serve": "nodemon ./dist/index.js",
         "test": "jest --watch",
-        "package": "rollup --config rollup.config.js --configPlugin typescript",
-        "child-start": "npm run package && node ./dist/index.js"
+        "child-serve": "node ./dist/index.js"
     },
     "jest": {
         "testPathIgnorePatterns": [
@@ -36,18 +34,13 @@
         ]
     },
     "dependencies": {
-        "@rollup/plugin-node-resolve": "^15.3.0",
-        "@rollup/plugin-typescript": "^12.1.1",
         "@types/express": "^5.0.0",
         "@types/express-ws": "^3.0.5",
         "@types/node": "^20.14.2",
-        "@types/pg": "^8.11.10",
         "dotenv": "^16.4.5",
         "express": "^4.19.2",
         "express-ws": "^5.0.2",
-        "pg": "^8.13.0",
-        "rollup": "^4.24.3",
-        "tslib": "^2.8.0",
+        "rimraf": "^6.0.1",
         "typescript": "^5.4.5"
     },
     "devDependencies": {

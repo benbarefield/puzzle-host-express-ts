@@ -2,9 +2,9 @@ import 'dotenv/config';
 import express from "express";
 import websocketExpress from 'express-ws';
 import {sessionStarter} from "puzzle-host-data-layer";
-import setupServer from "./serverSetup";
-import authorization from "./authorization";
-import puzzleListener from "./endpoints/puzzleListener";
+import setupServer from "./serverSetup.js";
+import authorization from "./authorization.js";
+import puzzleListener from "./endpoints/puzzleListener.js";
 import EventEmitter from "node:events";
 
 const port = 8888;
@@ -21,7 +21,7 @@ const app = websocketExpress(express()).app;
 
   let dbClient = null;
   try {
-    dbClient = await sessionStarter();
+    dbClient = await sessionStarter(process.argv[process.argv.length - 1]);
   }
   catch(e) {
     console.log("error connecting to database:", e);
