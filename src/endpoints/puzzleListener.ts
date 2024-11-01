@@ -3,7 +3,7 @@ import {WebSocket} from 'ws';
 import EventEmitter from "node:events";
 
 const websocketMap: {
-  [key: number]: WebSocket[];
+  [key: string]: WebSocket[];
 } = {};
 
 export const PUZZLE_QUERIED_EVENT = "puzzleQueried";
@@ -20,9 +20,8 @@ export default function(ee: EventEmitter) {
   });
 
   return (ws: WebSocket, req: Request) => {
-    const puzzleId = +req.params.id;
+    const puzzleId = req.params.id;
 
-    if(isNaN(puzzleId)) { return; }
     if(!websocketMap[puzzleId]) {
       websocketMap[puzzleId] = [];
     }
