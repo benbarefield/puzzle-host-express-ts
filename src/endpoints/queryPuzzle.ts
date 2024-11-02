@@ -5,7 +5,7 @@ import {checkPuzzleGuess} from "puzzle-host-data-layer";
 
 export default async function(req: Request, res: Response): Promise<void> {
   if(req.method !== "GET") {
-    res.status(501).send();
+    res.status(501).send("Not implemented");
     return;
   }
 

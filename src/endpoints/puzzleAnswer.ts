@@ -170,5 +170,5 @@ export default async function puzzleAnswer(req: Request, res: Response): Promise
     return putPuzzleAnswer(req, res);
   }
 
-  res.status(501).send();
+  res.status(501).send("Not implemented");
 }

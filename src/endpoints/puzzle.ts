@@ -123,5 +123,5 @@ export default async function(req: Request, res: Response) : Promise<void> {
   if(req.method === "PUT") {
     return putPuzzle(req, res);
   }
-  res.status(501).send();
+  res.status(501).send("Not implemented");
 }
